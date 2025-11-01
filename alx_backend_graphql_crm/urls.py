@@ -19,15 +19,18 @@ from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
 
-urlpatterns = [
-    path(
-        "graphql",
-        csrf_exempt(
-            GraphQLView.as_view(
-                graphiql=True,
-                template_name="graphene_django/graphiql.html",
-            )
-        ),
-    ),
-]
+# Try to import Playground UI, fall back to a stub so management commands don't fail.
+try:
+    from django_graphql_playground.views import GraphQLPlaygroundView
+    playground_view = GraphQLPlaygroundView.as_view(endpoint="/graphql")
+except Exception:
+    from django.http import HttpResponse
+    def playground_view(request):
+        return HttpResponse("GraphQL Playground not available", status=503)
 
+urlpatterns = [
+    # Raw GraphQL endpoint (no UI). This never imports templates.
+    path("graphql", csrf_exempt(GraphQLView.as_view(graphiql=False))),
+    # Optional UI (safe fallback if package missing)
+    path("graphiql", playground_view),
+]
