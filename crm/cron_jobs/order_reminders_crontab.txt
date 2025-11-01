@@ -1,2 +1,2 @@
 cat > crm/cron_jobs/customer_cleanup_crontab.txt <<'CRON'
-printf '0 2 * * 0 /bin/bash /Users/la/alx-backend-graphql_crm/crm/cron_jobs/clean_inactive_customers.sh' > crm/cron_jobs/customer_cleanup_crontab.txt
+0 2 * * 0 /bin/bash /Users/la/alx-backend-graphql_crm/crm/cron_jobs/clean_inactive_customers.sh
