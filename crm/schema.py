@@ -9,6 +9,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 
 from .models import Customer, Product, Order
 from .filters import CustomerFilter, ProductFilter, OrderFilter
+from crm.models import Product
 
 # ----------------------------------------------------
 # Types used by mutations (keep as-is)
