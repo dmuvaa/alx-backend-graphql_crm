@@ -315,8 +315,33 @@ class Query(graphene.ObjectType):
     def resolve_orders(root, info):
         return Order.objects.select_related("customer").prefetch_related("products").all()
 
+
+class UpdateLowStockProducts(graphene.Mutation):
+    class Arguments:
+        pass  # no inputs
+
+    products = graphene.List(ProductType)
+    message = graphene.String()
+
+    @staticmethod
+    def mutate(root, info):
+        updated_products = []
+        with transaction.atomic():
+            # Lock rows to avoid race conditions and return updated objects
+            low_stock_qs = Product.objects.select_for_update().filter(stock__lt=10)
+            for p in low_stock_qs:
+                p.stock = (p.stock or 0) + 10  # simulate restock by +10
+                p.full_clean()
+                p.save(update_fields=["stock"])
+                updated_products.append(p)
+
+        msg = f"Restocked {len(updated_products)} product(s)."
+        return UpdateLowStockProducts(products=updated_products, message=msg)
+
+
 class Mutation(graphene.ObjectType):
     create_customer = CreateCustomer.Field()
     bulk_create_customers = BulkCreateCustomers.Field()
     create_product = CreateProduct.Field()
     create_order = CreateOrder.Field()
+    update_low_stock_products = UpdateLowStockProducts.Field()
