@@ -1,6 +1,7 @@
 # crm/tasks.py
 from datetime import datetime
 import os
+import requests
 
 from celery import shared_task
 from gql.transport.requests import RequestsHTTPTransport
